@@ -3,10 +3,7 @@
 #include <ws2tcpip.h>
 #include <cstdio>
 #include <iostream>
-#include <vector>
 #include <string>
-#include <sstream>
-#include <cctype>
 
 using namespace std;
 
@@ -20,11 +17,6 @@ int main(int argc, char **argv)
     getline(cin, input1);
     cout << "Enter the operation (add or mult): ";
     getline(cin, input2);
-
-    if (input2 != "add" && input2 != "mult") {
-        cout << "operation error";
-        return 1;
-    }
 
     input1 += input2;
 

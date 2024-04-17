@@ -163,7 +163,7 @@ int main()
     // No longer need server socket
     closesocket(ListenSocket);
 
-    struct sockaddr_in clientAddr;
+    struct sockaddr_in clientAddr{};
     int addrLen = sizeof(clientAddr);
     getpeername(ClientSocket, (struct sockaddr*)&clientAddr, &addrLen);
 
@@ -179,35 +179,41 @@ int main()
 
             string oper;
             string data;
-            if (recvbuf[iResult - 1] == 't') {
+            string infoToSend;
+            bool isOperationCorrect = true;
+            if (recvbuf[iResult - 1] == 't' && recvbuf[iResult - 2] == 'l' && recvbuf[iResult - 3] == 'u' && recvbuf[iResult - 4] == 'm') {
                 oper = "mult";
                 string receivedInfo(recvbuf, iResult - 4);
                 data = receivedInfo;
-            } else {
+            } else if (recvbuf[iResult - 1] == 'd' && recvbuf[iResult - 2] == 'd' && recvbuf[iResult - 3] == 'a') {
                 oper = "add";
                 string receivedInfo(recvbuf, iResult - 3);
                 data = receivedInfo;
-            }
-
-            vector<string> substrings = splitBySpace(data);
-
-            bool flag = true;
-            for (const string& substr : substrings) {
-                if (!isNumber(substr)) {
-                    flag = false;
-                }
-            }
-            string infoToSend;
-            if (oper == "add" && !flag) {
-                infoToSend = concatenate(substrings);
-            } else if (!flag) {
-                infoToSend = "Impossible to multiply not numbers.";
             } else {
-                vector<double> numbers = convertToNumbers(substrings);
-                if (oper == "add") {
-                    infoToSend = to_string(add(numbers));
-                } else if (oper == "mult") {
-                    infoToSend = to_string(multiply(numbers));
+                infoToSend = "Your entered incorrect operation.";
+                isOperationCorrect = false;
+            }
+
+            if (isOperationCorrect) {
+                vector<string> substrings = splitBySpace(data);
+
+                bool flag = true;
+                for (const string& substr : substrings) {
+                    if (!isNumber(substr)) {
+                        flag = false;
+                    }
+                }
+                if (oper == "add" && !flag) {
+                    infoToSend = concatenate(substrings);
+                } else if (!flag) {
+                    infoToSend = "Impossible to multiply not numbers.";
+                } else {
+                    vector<double> numbers = convertToNumbers(substrings);
+                    if (oper == "add") {
+                        infoToSend = to_string(add(numbers));
+                    } else if (oper == "mult") {
+                        infoToSend = to_string(multiply(numbers));
+                    }
                 }
             }
 
